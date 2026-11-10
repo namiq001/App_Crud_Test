@@ -63,3 +63,8 @@ AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
 VITE_APP_NAME="${APP_NAME}"
+
+
+
+composer require intervention/image-laravel 
+php artisan make:migration add_parent_id_to_categories_table --table=categories  admin create subcategories
