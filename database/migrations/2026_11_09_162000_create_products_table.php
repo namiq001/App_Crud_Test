@@ -13,6 +13,22 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->string('short_description')->nullable();
+            $table->text('information')->nullable();
+            $table->text('description');
+            $table->decimal('regular_price' , 10 , 2);
+            $table->decimal('sale_price' , 10 ,2 )->nullable();
+            $table->string('SKU')->unique()->index();
+            $table->enum('stock_status', ['instock','outofstock'])->default('instock');
+            $table->boolean('featured')->default(false);
+            $table->unsignedInteger('quantity')->default(10);;
+            $table->string('image')->nullable();
+            $table->string('images')->nullable();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('cascade');
+            $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('cascade');
+            $table->boolean('status')->default(false);
             $table->timestamps();
         });
     }

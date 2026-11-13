@@ -37,123 +37,43 @@
         </div>
     </section>
 
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-2xl font-bold mb-10 text-center uppercase tracking-widest text-gray-800">Popular Categories
-            </h2>
+ <!-- Popular Category -->
 
+    <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-bold mb-10 text-center uppercase tracking-widest text-gray-800">
+            Popular Categories
+        </h2>
+
+        @if ($categories->count())
             <div class="swiper-container category-slider overflow-hidden">
                 <div class="swiper-wrapper pb-10">
 
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/1.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Living Room">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Living Room
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/2.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Bedroom">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Bedroom
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/3.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Dining">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Dining Room
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/4.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Office">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Office
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/5.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Storage">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Storage
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/6.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Outdoor">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Outdoor
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/9.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Lighting">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Kitchen & Bar
-                        </h4>
-                    </div>
-
-                    <div class="swiper-slide text-center group">
-                        <a href="#"
-                            class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
-                            <img src="uploads/categories/10.jpg"
-                                class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                alt="Decor">
-                        </a>
-                        <h4
-                            class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
-                            Kids' Room
-                        </h4>
-                    </div>
+                    @foreach ($categories as $category)
+                        <div class="swiper-slide text-center group">
+                            <a href="{{ route('category.show', $category->slug) }}"
+                                class="block bg-white rounded-2xl p-6 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-2xl hover:-translate-y-2">
+                                <img src="{{ $category->image ? asset('uploads/categories/thumbnails/' . $category->image) : 'https://placehold.co/96x96?text=No+Image' }}"
+                                    class="mx-auto w-24 h-24 object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                                    alt="{{ $category->name }}">
+                            </a>
+                            <h4
+                                class="mt-5 font-semibold text-gray-600 group-hover:text-primary transition-colors uppercase text-xs tracking-widest">
+                                {{ $category->name }}
+                            </h4>
+                        </div>
+                    @endforeach
 
                 </div>
                 <div class="swiper-pagination"></div>
             </div>
-        </div>
-    </section>
+        @else
+            <p class="text-center text-gray-500">No categories yet.</p>
+        @endif
+    </div>
+</section>
+
+<!--  end popular Category -->
 
     <section class="py-10 bg-white">
         <div class="container mx-auto px-4">

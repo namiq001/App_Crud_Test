@@ -1285,7 +1285,8 @@
                     "type": "ko_fi"
                 }
             ],
-            "time": "2026-07-22T15:00:50+00:00"
+            "time": "2026-07-22T15:00:50+00:00",
+            "published-time": "2026-07-22T15:02:22+00:00"
         },
         {
             "name": "laravel/breeze",
@@ -8752,5 +8753,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

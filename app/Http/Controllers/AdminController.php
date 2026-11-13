@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
@@ -45,8 +46,8 @@ class AdminController extends Controller
         ]);
 
         $request->validate([
-            'name'  => 'required|string|max:255',
-            'slug'  => 'required|string|max:255|unique:brands,slug',
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:brands,slug',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'nullable|boolean'
         ]);
@@ -112,7 +113,8 @@ class AdminController extends Controller
             if ($brand->image) {
                 @unlink(public_path('uploads/brands/' . $brand->image));
                 @unlink(public_path('uploads/brands/thumbnails' . $brand->image));
-            };
+            }
+            ;
 
             $imageName = time() . '_' . uniqid() . '.' . $request->image->extension();
             $this->generateThumbnailImage($request->image, $imageName, 'uploads/brands', 124, 124);
@@ -171,8 +173,8 @@ class AdminController extends Controller
         ]);
 
         $request->validate([
-            'name'  => 'required|string|max:255',
-            'slug'  => 'required|string|max:255|unique:categories,slug',
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:categories,slug',
             'parent_id' => 'nullable|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'nullable|boolean'
@@ -198,6 +200,7 @@ class AdminController extends Controller
         }
 
         $category->save();
+
 
         return redirect()->route('admin.categories')->with('success', 'Category added successfully');
     }
@@ -230,7 +233,8 @@ class AdminController extends Controller
             if ($category->image) {
                 @unlink(public_path('uploads/categories/' . $category->image));
                 @unlink(public_path('uploads/categories/thumbnails' . $category->image));
-            };
+            }
+            ;
 
             $imageName = time() . '_' . uniqid() . '.' . $request->image->extension();
             $this->generateThumbnailImage($request->image, $imageName, 'uploads/categories/', 124, 124);
@@ -256,5 +260,37 @@ class AdminController extends Controller
         $category->delete();
 
         return back()->with('success', 'Category delete successfully');
+    }
+
+    public function customers(Request $request)
+    {
+        $customers = User::query()
+            ->where('utype', '!=', 'ADMIN')   // adminlər görünməsin
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $term = '%' . $request->search . '%';
+                $q->where(function ($q) use ($term) {
+                    $q->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term)
+                        ->orWhere('phone', 'like', $term);
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.customers', compact('customers'));
+    }
+
+    public function customerDelete($id)
+    {
+        $customer = User::findOrFail($id);
+
+        if ($customer->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete yourself.');
+        }
+
+        $customer->delete();
+
+        return redirect()->route('admin.customers')->with('success', 'Customer deleted successfully');
     }
 }

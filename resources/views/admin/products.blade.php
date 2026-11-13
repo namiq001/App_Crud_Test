@@ -1,0 +1,309 @@
+<x-admin-layout>
+    <!-- Main Content Start -->
+
+    <main class="flex-1 overflow-y-auto p-6 bg-gray-100">
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Products</h1>
+                <p class="text-sm text-gray-500">Manage your product catalog</p>
+            </div>
+            <a href="{{ route('admin.product.add') }}"
+                class="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Add New Product
+            </a>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <form id="filter-form" method="GET" action="{{ route('admin.products') }}">
+                <div class="flex flex-col md:flex-row gap-4 justify-between">
+                    <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+
+                        <div class="relative w-full md:w-64">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fa-solid fa-search text-gray-400"></i>
+                            </span>
+                            <input type="text" id="search-input" name="search" value="{{ request('search') }}"
+                                autocomplete="off"
+                                class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                                placeholder="Search product name...">
+                        </div>
+
+                        <select name="category" onchange="this.form.submit()"
+                            class="w-full md:w-48 border px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-primary bg-white text-gray-600">
+                            <option value="">All Categories</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <select name="status" onchange="this.form.submit()"
+                            class="w-full md:w-40 border px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-primary bg-white text-gray-600">
+                            <option value="">All Status</option>
+                            <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published
+                            </option>
+                            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                            <option value="outofstock" {{ request('status') == 'outofstock' ? 'selected' : '' }}>Out of
+                                Stock</option>
+                        </select>
+
+                        @if (request()->hasAny(['search', 'category', 'status']))
+                            <a href="{{ route('admin.products') }}"
+                                class="flex items-center text-sm text-gray-500 hover:text-red-500">
+                                <i class="fa-solid fa-xmark mr-1"></i> Clear
+                            </a>
+                        @endif
+                    </div>
+
+                    <button type="button"
+                        class="border border-gray-300 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-export"></i> Export
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+            <div class="overflow-x-auto">
+
+                @if (session('success'))
+                    <div class="bg-green-100 text-green-700 px-4 py-2">
+                        {{ session('success') }}
+                    </div>
+
+                @endif
+
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">
+                                <input type="checkbox" id="selectAll"
+                                    class="rounded border-gray-300 text-primary focus:ring-primary">
+                            </th>
+                            <th class="px-6 py-4">Product Name</th>
+                            <th class="px-6 py-4">Brand</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Price</th>
+                            <th class="px-6 py-4">Stock</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+
+                        @forelse ($products as $product)
+
+
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" name="ids[]" value="{{ $product->id }}"
+                                        class="rounded border-gray-300 text-primary focus:ring-primary">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ asset('uploads/products/thumbnails') }}/{{ $product->image }}"
+                                            class="w-12 h-12 rounded object-cover border" alt="{{ $product->name }}">
+                                        <div>
+                                            <p class="font-semibold text-gray-800 text-sm">{{ $product->name }}</p>
+                                            <p class="text-xs text-gray-500">SKU: {{ $product->SKU }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ $product->brand?->name ?? '-' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ $product->category?->name ?? '-' }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800">
+                                    @if ($product->sale_price)
+                                        <span
+                                            class="line-through text-gray-400 mr-2">${{ number_format($product->regular_price, 2) }}</span>
+                                        <span class="text-primary">${{ number_format($product->sale_price, 2) }}</span>
+                                    @else
+                                        <span class="text-gray-800">${{ number_format($product->regular_price, 2) }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ $product->quantity }}</td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+                                        @if ($product->status)
+                                            Pupliseh
+                                        @else
+                                            Draft
+                                        @endif
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('admin.product.edit', ['id' => $product->id]) }}"
+                                            class="w-8 h-8 rounded-full hover:bg-gray-100 text-blue-500 transition flex items-center justify-center"
+                                            title="Edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+
+                                        <button type="button"
+                                            onclick="deleteProduct(this, @js($product->name), {{ $product->id }})"
+                                            class="w-8 h-8 rounded-full hover:bg-gray-100 text-red-500 transition flex items-center justify-center"
+                                            title="Delete">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+
+                                        <form id="delete-form-{{ $product->id }}" method="POST"
+                                            action="{{ route('admin.product.delete', ['id' => $product->id]) }}"
+                                            class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-500">
+                                        <i class="fa-solid fa-boxes-stacked text-4xl mb-3 text-gray-300"></i>
+                                        <h3 class="text-lg font-medium text-gray-900">Products not available</h3>
+                                        <p class="text-sm mt-1">You haven't added any products to your store yet.</p>
+                                        <a href="{{ route('admin.product.add') }}"
+                                            class="mt-4 text-primary hover:underline text-sm font-medium">
+                                            Add your first product
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div
+                class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                {{ $products->links() }}
+            </div>
+        </div>
+
+    </main>
+    <!-- Main Content End -->
+
+
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
+
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div
+                    class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div
+                                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
+                            </div>
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-title">Delete
+                                    Product
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">Are you sure you want to delete <strong
+                                            id="delete-product-name" class="text-gray-800">this product</strong>?
+                                        All
+                                        of
+                                        its
+                                        data will be permanently removed. This action cannot be undone.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button type="button" id="confirmDeleteBtn"
+                            class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto transition">Delete</button>
+                        <button type="button" id="cancelDeleteBtn"
+                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Elements
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancelDeleteBtn');
+        const productNameSpan = document.getElementById('delete-product-name');
+
+        // Variables to hold the state of what we are deleting
+        let rowToDelete = null;
+        let productIdToDelete = null;
+
+        // Function triggered when the trash icon is clicked
+        function deleteProduct(buttonElement, productName, productId) {
+            // Save the row so we can remove it later
+            rowToDelete = buttonElement.closest('tr');
+            productIdToDelete = productId;
+
+            // Update the modal text dynamically
+            productNameSpan.textContent = productName || "this product";
+
+            // Show the modal by removing the 'hidden' class
+            deleteModal.classList.remove('hidden');
+        }
+
+        // Close Modal Function
+        function closeModal() {
+            deleteModal.classList.add('hidden');
+            rowToDelete = null;
+            productIdToDelete = null;
+        }
+
+        // Handle Cancel Button
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Handle clicking outside the modal to close it
+        deleteModal.addEventListener('click', function (event) {
+            // If the user clicks on the backdrop (not the panel), close it
+            if (event.target === this || event.target.classList.contains('bg-opacity-75')) {
+                closeModal();
+            }
+        });
+
+        // Handle Confirm Delete Button
+        confirmBtn.addEventListener('click', function () {
+            if (productIdToDelete) {
+                const form = document.getElementById(`delete-form-${productIdToDelete}`);
+                if (form) {
+                    form.submit();
+                }
+            }
+        });
+
+
+        const searchInput = document.getElementById('search-input');
+        const filterForm = document.getElementById('filter-form');
+        let searchTimer;
+
+        if (searchInput && filterForm) {
+            // Səhifə yenilənəndən sonra kursoru inputun sonuna qoy
+            if (searchInput.value) {
+                searchInput.focus();
+                const len = searchInput.value.length;
+                searchInput.setSelectionRange(len, len);
+            }
+
+            // Yazdıqca axtar (yazmağı dayandıranda 400ms sonra)
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => filterForm.submit(), 400);
+            });
+        }
+        
+    </script>
+
+</x-admin-layout>
